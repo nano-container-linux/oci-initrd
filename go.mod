@@ -4,7 +4,7 @@ go 1.26.4
 
 require (
 	github.com/schollz/progressbar/v3 v3.19.1
-	github.com/ulikunitz/xz v0.5.16
+	github.com/ulikunitz/xz v0.5.17
 	github.com/vishvananda/netlink v1.3.1
 )
 
