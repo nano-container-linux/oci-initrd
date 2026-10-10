@@ -1,6 +1,6 @@
 module oci-init
 
-go 1.27.1
+go 1.27.2
 
 require (
 	github.com/schollz/progressbar/v3 v3.19.1
