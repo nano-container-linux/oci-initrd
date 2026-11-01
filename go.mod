@@ -3,8 +3,8 @@ module oci-init
 go 1.27.3
 
 require (
+	github.com/go-compressions/xz v0.1.0
 	github.com/schollz/progressbar/v3 v3.19.1
-	github.com/ulikunitz/xz v0.5.17
 	github.com/vishvananda/netlink v1.3.1
 )
 

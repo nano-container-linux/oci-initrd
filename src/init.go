@@ -15,7 +15,7 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/ulikunitz/xz"
+	"oci-init/internal/xzopen"
 
 	progressbar "github.com/schollz/progressbar/v3"
 
@@ -373,7 +373,7 @@ func fetchAndExtractRootfs(blob io.Reader, totalSize int64, rootfs string, ociHt
 	case n >= 6 && header[0] == 0xfd && header[1] == '7' && header[2] == 'z' && header[3] == 'X' && header[4] == 'Z' && header[5] == 0x00:
 		// xz
 		fullReader := io.MultiReader(bytes.NewReader(header[:n]), tee)
-		xzr, err := xz.NewReader(fullReader)
+		xzr, err := xzopen.NewReader(fullReader)
 		if err != nil {
 			logFatalWithPrefix("Failed to open xz rootfs: %v", err)
 		}

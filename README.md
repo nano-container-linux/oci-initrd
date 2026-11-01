@@ -36,6 +36,28 @@ The boot target is selected entirely through `/proc/cmdline`:
 
 References accept `http://`, `https://` and `oci://` schemes.
 
+## What bounds an `xz` rootfs
+
+The rootfs arrives from the network, and `/init` is PID 1 on a machine whose
+memory is the ramdisk, so the decoder must not size its memory from the
+stream. The `xz` layer is decoded with
+[`go-compressions/xz`](https://github.com/go-compressions/xz), not
+`ulikunitz/xz`. The latter allocates the LZMA2 dictionary whole from the block
+header (`DictCap` is a minimum, not a ceiling): a 44-byte `.xz` declaring a
+1.5 GiB dictionary allocated 1,610,663,976 bytes. Here the window grows with
+the decoded data: a stream declaring 1.5 GiB over a few bytes allocates about
+22 KB (`internal/xzopen/xzopen_test.go`, run in CI as a compiled binary under
+`ulimit -v` and `GOMEMLIMIT`). The dictionary a stream may make the decoder
+keep is capped at 256 MiB (`xzopen.MaxDictionary`, above the 64 MiB of
+`xz -9`); data that needs more fails with `xz.ErrTooLarge` and the boot stops
+with "Failed to open xz rootfs" or "Error reading tar rootfs". The `/init`
+binary is slightly smaller than before (11,299,388 to 11,235,046 bytes,
+linux/amd64).
+
+The reader lives in `internal/xzopen` rather than in `src/init.go` because the
+Taskfile builds the init binary from that one file and because `init.go`
+imports Linux-only packages, so nothing in it can be tested elsewhere.
+
 ## Build
 
 Uses [Task](https://taskfile.dev). The default architecture is `arm64`.
